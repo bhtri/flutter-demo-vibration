@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:vibration/vibration.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,11 +33,50 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  Future<void> demo1() async {
+    AudioCache audioCache = AudioCache();
+    await audioCache.play('audio/aa.mp3');
+    audioCache.clearAll();
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
+    Vibration.hasCustomVibrationsSupport().then((value) {
+      bool check = value ?? false;
+      if (check) {
+        Vibration.vibrate(
+          pattern: [
+            0,
+            500,
+          ],
+          amplitude: 255, // 振幅
+          intensities: Platform.isAndroid ? [0, 255] : [255], // 強度
+        );
+      }
+    });
+  }
+
+  Future<void> demo2() async {
+    AudioCache audioCache = AudioCache();
+    await audioCache.play('audio/bb.mp3');
+    audioCache.clearAll();
+
+    Vibration.hasCustomVibrationsSupport().then((value) {
+      bool check = value ?? false;
+
+      if (check) {
+        Vibration.vibrate(
+          pattern: [
+            0,
+            300,
+            100,
+            300,
+            100,
+            300,
+          ],
+          amplitude: 255, // 振幅
+          intensities: Platform.isAndroid
+              ? [0, 255, 0, 255, 0, 255]
+              : [255, 255, 255], // 強度
+        );
+      }
     });
   }
 
@@ -50,17 +93,12 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'You have pushed the button this many times:',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            ElevatedButton(
+              onPressed: demo1,
+              child: const Text('Button demo 1'),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
